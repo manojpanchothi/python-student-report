@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice Questions - N24H01A0395</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; text-align: center; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .title { font-size: 26px; font-weight: bold; color: #007BFF; margin-bottom: 20px; }
+    .question-category {
+      font-size: 22px; font-weight: bold; margin-top: 20px; color: white;
+      cursor: pointer; padding: 15px; border-radius: 5px; text-align: left;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .easy-category { background-color: #5a9367; }
+    .medium-category { background-color: #d4a60b; }
+    .hard-category { background-color: #b64b46; }
+    .question-category:hover { filter: brightness(90%); transform: scale(1.02); }
+    .question-list {
+      display: none; flex-wrap: wrap; justify-content: center; gap: 15px;
+      padding: 10px; list-style: none; border: 1px solid #ddd; border-radius: 5px;
+      margin-top: 5px; background: #f3f3f3;
+    }
+    .question-item {
+      background: white; padding: 15px; border-radius: 8px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center;
+      width: 250px; transition: transform 0.2s ease-in-out;
+    }
+    .question-item:hover { transform: scale(1.05); }
+    .easy a { color: #5a9367; font-weight: bold; }
+    .medium a { color: #d4a60b; font-weight: bold; }
+    .hard a { color: #b64b46; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Personalized Practice Set - N24H01A0395</h1>
+    <div id="question-container"></div>
+  </div>
+  <script>
+    const userId = "e19c61c6-bbd7-4ec0-9445-4d520b38c791";
+    async function fetchRecommendedQuestions() {
+      try {
+        const response = await fetch('https://manojpanchothi.github.io/recommendation/data.json');
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching recommended questions:', error);
+        alert("Error fetching practice questions. Please try again later.");
+        return [];
+      }
+    }
+    async function loadPracticeQuestions() {
+      const questionData = await fetchRecommendedQuestions();
+      if (!questionData.length) {
+        alert("No questions found.");
+        return;
+      }
+      // Filter questions using the student's user_id.
+      const studentQuestions = questionData.filter(q => q.user_id.trim() === userId);
+      const questionContainer = document.getElementById("question-container");
+      const categories = { EASY: [], MEDIUM: [], HARD: [] };
+      studentQuestions.forEach(q => {
+        const li = document.createElement("li");
+        li.classList.add("question-item", q.difficulty.toLowerCase());
+        const a = document.createElement("a");
+        a.href = q.LINK;
+        a.innerText = q.question_short_text;
+        a.target = "_blank";
+        li.appendChild(a);
+        categories[q.difficulty].push(li);
+      });
+      Object.keys(categories).forEach(difficulty => {
+        if (categories[difficulty].length > 0) {
+          const section = document.createElement("div");
+          const categoryHeader = document.createElement("div");
+          categoryHeader.classList.add("question-category", difficulty.toLowerCase() + "-category");
+          categoryHeader.innerText = difficulty + " Questions";
+          const ul = document.createElement("ul");
+          ul.classList.add("question-list");
+          ul.style.display = "none";
+          categoryHeader.onclick = () => {
+            ul.style.display = (ul.style.display === "none") ? "flex" : "none";
+          };
+          categories[difficulty].forEach(item => ul.appendChild(item));
+          section.appendChild(categoryHeader);
+          section.appendChild(ul);
+          questionContainer.appendChild(section);
+        }
+      });
+    }
+    loadPracticeQuestions();
+  </script>
+</body>
+</html>
